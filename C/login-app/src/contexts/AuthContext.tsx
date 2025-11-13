@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 interface AuthContextType {
   user: string | null;
@@ -12,19 +13,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AUTH_STORAGE_KEY = 'auth_user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Initialize state from localStorage
-  const [user, setUser] = useState<string | null>(() => {
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    return stored || null;
-  });
-
-  useEffect(() => {
-    if (!user) {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-      return;
-    }
-    localStorage.setItem(AUTH_STORAGE_KEY, user);
-  }, [user]);
+  const [user, setUser] = useLocalStorage<string | null>(AUTH_STORAGE_KEY, null);
 
   const login = (email: string) => {
     setUser(email);
